@@ -1,0 +1,547 @@
+{
+  "paragraphs": [
+    {
+      "title": "",
+      "text": "import org.apache.commons.io.IOUtils\nimport java.net.URL\nimport java.nio.charset.Charset\n\n// Zeppelin creates and injects sc (SparkContext) and sqlContext (HiveContext or SqlContext)\n// So you don\u0027t need create them manually\n\n// load bank data\nval bankText \u003d sc.parallelize(\n    IOUtils.toString(\n        new URL(\"https://s3.amazonaws.com/apache-zeppelin/tutorial/bank/bank.csv\"),\n        Charset.forName(\"utf8\")).split(\"\\n\"))\n\ncase class Bank(age: Integer, job: String, marital: String, education: String, balance: Integer)\n\nval bank \u003d bankText.map(s \u003d\u003e s.split(\";\")).filter(s \u003d\u003e s(0) !\u003d \"\\\"age\\\"\").map(\n    s \u003d\u003e Bank(s(0).toInt, \n            s(1).replaceAll(\"\\\"\", \"\"),\n            s(2).replaceAll(\"\\\"\", \"\"),\n            s(3).replaceAll(\"\\\"\", \"\"),\n            s(5).replaceAll(\"\\\"\", \"\").toInt\n        )\n).toDF()\nbank.registerTempTable(\"bank\")",
+      "dateUpdated": "Nov 7, 2016 5:27:21 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "tableHide": false,
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1427958262346_1202575677",
+      "id": "20150402-160422_27942045",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "\nimport org.apache.commons.io.IOUtils\n\nimport java.net.URL\n\nimport java.nio.charset.Charset\n\nbankText: org.apache.spark.rdd.RDD[String] \u003d ParallelCollectionRDD[134] at parallelize at \u003cconsole\u003e:36\n\ndefined class Bank\n\nbank: org.apache.spark.sql.DataFrame \u003d [age: int, job: string ... 3 more fields]\n\nwarning: there was one deprecation warning; re-run with -deprecation for details\n"
+      },
+      "dateCreated": "Apr 2, 2015 4:04:22 AM",
+      "dateStarted": "Nov 7, 2016 5:27:22 AM",
+      "dateFinished": "Nov 7, 2016 5:27:25 AM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "",
+      "text": "%sql select * from bank limit 5",
+      "dateUpdated": "Nov 7, 2016 5:27:45 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 284.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "age",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [],
+          "groups": [],
+          "scatter": {
+            "xAxis": {
+              "name": "age",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          }
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/sql",
+        "editorHide": false,
+        "helium": {}
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1427958475810_676915090",
+      "id": "20150402-160755_249038966",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "age\tjob\tmarital\teducation\tbalance\n30\tunemployed\tmarried\tprimary\t1787\n33\tservices\tmarried\tsecondary\t4789\n35\tmanagement\tsingle\ttertiary\t1350\n30\tmanagement\tmarried\ttertiary\t1476\n59\tblue-collar\tmarried\tsecondary\t0\n"
+      },
+      "dateCreated": "Apr 2, 2015 4:07:55 AM",
+      "dateStarted": "Nov 7, 2016 5:27:29 AM",
+      "dateFinished": "Nov 7, 2016 5:27:29 AM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "",
+      "text": "%sql select* from bank where age \u003c ${age\u003d30} limit 500",
+      "dateUpdated": "Nov 7, 2016 5:27:49 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "scatterChart",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "age",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [
+            {
+              "name": "job",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          ],
+          "groups": [],
+          "scatter": {
+            "xAxis": {
+              "name": "balance",
+              "index": 4.0,
+              "aggr": "sum"
+            },
+            "yAxis": {
+              "name": "age",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          }
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/sql",
+        "editorHide": false,
+        "tableHide": false,
+        "helium": {}
+      },
+      "settings": {
+        "params": {
+          "age": "34"
+        },
+        "forms": {
+          "age": {
+            "name": "age",
+            "defaultValue": "30",
+            "hidden": false
+          }
+        }
+      },
+      "apps": [],
+      "jobName": "paragraph_1427958494057_-277246858",
+      "id": "20150402-160814_1240506022",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "age\tjob\tmarital\teducation\tbalance\n30\tunemployed\tmarried\tprimary\t1787\n33\tservices\tmarried\tsecondary\t4789\n30\tmanagement\tmarried\ttertiary\t1476\n20\tstudent\tsingle\tsecondary\t502\n31\tblue-collar\tmarried\tsecondary\t360\n25\tblue-collar\tsingle\tprimary\t-221\n31\tservices\tmarried\tsecondary\t132\n26\thousemaid\tmarried\ttertiary\t543\n31\ttechnician\tmarried\tsecondary\t171\n32\tmanagement\tsingle\ttertiary\t2536\n32\tblue-collar\tmarried\tsecondary\t2089\n33\tmanagement\tmarried\tsecondary\t3935\n23\tservices\tsingle\ttertiary\t363\n32\ttechnician\tmarried\ttertiary\t396\n32\ttechnician\tsingle\ttertiary\t2204\n26\tblue-collar\tmarried\tprimary\t0\n32\tentrepreneur\tsingle\tprimary\t-849\n33\tself-employed\tsingle\ttertiary\t2155\n31\tservices\tmarried\tsecondary\t338\n29\ttechnician\tmarried\tsecondary\t444\n32\ttechnician\tsingle\ttertiary\t360\n31\tmanagement\tsingle\ttertiary\t6248\n27\tadmin.\tdivorced\tsecondary\t451\n28\tadmin.\tsingle\tsecondary\t177\n27\tservices\tsingle\tsecondary\t-195\n32\tmanagement\tsingle\ttertiary\t3616\n30\tadmin.\tsingle\ttertiary\t261\n31\tunemployed\tsingle\tprimary\t406\n32\tmanagement\tsingle\ttertiary\t574\n33\tself-employed\tmarried\ttertiary\t483\n27\thousemaid\tmarried\tprimary\t0\n21\tstudent\tsingle\tsecondary\t2488\n32\tself-employed\tmarried\tsecondary\t217\n33\tblue-collar\tsingle\tsecondary\t22\n25\tstudent\tsingle\tsecondary\t331\n25\ttechnician\tsingle\tsecondary\t505\n30\tservices\tmarried\tsecondary\t1808\n22\tadmin.\tsingle\tsecondary\t4111\n31\tadmin.\tdivorced\tsecondary\t1890\n32\ttechnician\tmarried\tsecondary\t2693\n24\tunemployed\tsingle\tsecondary\t119\n32\tblue-collar\tsingle\tsecondary\t228\n27\ttechnician\tsingle\tsecondary\t769\n33\tmanagement\tsingle\ttertiary\t0\n29\tadmin.\tsingle\tsecondary\t428\n32\tmanagement\tdivorced\ttertiary\t948\n32\tmanagement\tsingle\ttertiary\t0\n31\tmanagement\tsingle\ttertiary\t874\n27\tself-employed\tsingle\tsecondary\t50\n25\tadmin.\tsingle\tsecondary\t4590\n28\tmanagement\tsingle\ttertiary\t80\n31\tadmin.\tsingle\tsecondary\t2104\n32\tblue-collar\tsingle\tsecondary\t1143\n32\tadmin.\tmarried\tsecondary\t1031\n28\ttechnician\tsingle\ttertiary\t172\n32\tservices\tsingle\tsecondary\t0\n33\tself-employed\tmarried\tsecondary\t215\n30\tmanagement\tsingle\ttertiary\t1372\n23\tstudent\tsingle\tsecondary\t9216\n27\tblue-collar\tsingle\tsecondary\t5563\n29\tblue-collar\tsingle\ttertiary\t455\n29\ttechnician\tmarried\tsecondary\t1599\n25\tblue-collar\tsingle\tsecondary\t-350\n31\tmanagement\tmarried\ttertiary\t-253\n30\tblue-collar\tmarried\tsecondary\t975\n32\tservices\tsingle\tsecondary\t406\n33\ttechnician\tmarried\tsecondary\t-204\n33\ttechnician\tmarried\tsecondary\t359\n30\tstudent\tsingle\tsecondary\t3096\n33\tblue-collar\tmarried\tsecondary\t3576\n27\tadmin.\tmarried\tsecondary\t-247\n32\tunemployed\tsingle\tsecondary\t0\n31\tmanagement\tmarried\ttertiary\t395\n32\tmanagement\tmarried\ttertiary\t2349\n28\tunemployed\tsingle\tsecondary\t16\n29\tblue-collar\tsingle\tsecondary\t482\n32\ttechnician\tsingle\tsecondary\t0\n29\tstudent\tsingle\tsecondary\t872\n33\ttechnician\tmarried\ttertiary\t-988\n24\tblue-collar\tsingle\tsecondary\t174\n32\tblue-collar\tmarried\tsecondary\t1148\n28\ttechnician\tsingle\ttertiary\t2269\n27\tself-employed\tmarried\tsecondary\t-220\n29\tmanagement\tmarried\ttertiary\t451\n32\tblue-collar\tmarried\tsecondary\t759\n25\tadmin.\tsingle\ttertiary\t760\n30\tblue-collar\tmarried\tprimary\t1317\n26\tunemployed\tsingle\tsecondary\t1064\n33\ttechnician\tmarried\tsecondary\t6699\n29\ttechnician\tsingle\ttertiary\t828\n32\tservices\tmarried\tprimary\t228\n30\tmanagement\tsingle\ttertiary\t424\n33\tblue-collar\tmarried\tprimary\t-195\n33\tmanagement\tsingle\ttertiary\t1410\n31\tblue-collar\tmarried\tsecondary\t1660\n29\tmanagement\tmarried\ttertiary\t318\n30\tservices\tsingle\tsecondary\t209\n27\tmanagement\tsingle\tunknown\t3196\n26\tstudent\tsingle\tsecondary\t2572\n23\tstudent\tsingle\tsecondary\t780\n32\tmanagement\tsingle\ttertiary\t8436\n30\tentrepreneur\tmarried\tsecondary\t946\n30\tservices\tsingle\tsecondary\t0\n27\tservices\tsingle\tsecondary\t468\n32\tblue-collar\tmarried\tsecondary\t1005\n33\tmanagement\tsingle\ttertiary\t1240\n28\tblue-collar\tsingle\tprimary\t0\n33\tblue-collar\tmarried\tsecondary\t43\n28\tblue-collar\tsingle\tsecondary\t517\n27\tblue-collar\tsingle\tsecondary\t148\n31\tservices\tsingle\tsecondary\t2070\n26\ttechnician\tsingle\ttertiary\t1216\n29\tblue-collar\tsingle\tprimary\t950\n26\ttechnician\tmarried\ttertiary\t3825\n32\tblue-collar\tmarried\tsecondary\t2366\n29\tmanagement\tmarried\ttertiary\t20\n31\tself-employed\tmarried\ttertiary\t259\n27\tadmin.\tsingle\tsecondary\t619\n30\tadmin.\tsingle\tsecondary\t239\n30\tmanagement\tmarried\ttertiary\t1221\n24\tblue-collar\tmarried\tsecondary\t1222\n31\ttechnician\tmarried\tsecondary\t2363\n27\ttechnician\tmarried\tsecondary\t1577\n32\tblue-collar\tmarried\tsecondary\t34\n25\tservices\tsingle\tsecondary\t402\n32\tblue-collar\tmarried\tsecondary\t889\n33\tmanagement\tmarried\ttertiary\t641\n33\tservices\tdivorced\tsecondary\t991\n32\tmanagement\tsingle\ttertiary\t12607\n31\tmanagement\tmarried\ttertiary\t13\n19\tstudent\tsingle\tprimary\t103\n31\tunemployed\tmarried\tsecondary\t296\n30\tblue-collar\tsingle\tsecondary\t315\n32\tmanagement\tmarried\ttertiary\t820\n27\tadmin.\tmarried\tsecondary\t1033\n32\tservices\tsingle\tsecondary\t182\n29\tblue-collar\tmarried\tsecondary\t15\n26\tmanagement\tsingle\tsecondary\t63\n27\ttechnician\tsingle\tunknown\t59\n27\tservices\tmarried\tsecondary\t0\n28\tstudent\tsingle\tsecondary\t378\n28\tstudent\tsingle\tsecondary\t11555\n26\tself-employed\tsingle\ttertiary\t211\n28\tstudent\tsingle\tsecondary\t459\n33\ttechnician\tsingle\ttertiary\t696\n29\tmanagement\tmarried\ttertiary\t361\n28\ttechnician\tsingle\tsecondary\t227\n31\tadmin.\tmarried\tsecondary\t236\n33\tmanagement\tsingle\ttertiary\t-53\n32\tself-employed\tsingle\tsecondary\t518\n31\ttechnician\tmarried\tsecondary\t660\n28\tentrepreneur\tmarried\tunknown\t1034\n32\tservices\tsingle\tsecondary\t2881\n31\tadmin.\tmarried\tsecondary\t88\n28\tblue-collar\tmarried\tsecondary\t1020\n32\tblue-collar\tmarried\tsecondary\t14\n26\tentrepreneur\tsingle\ttertiary\t81\n31\tblue-collar\tmarried\tsecondary\t-45\n28\tmanagement\tsingle\ttertiary\t231\n31\tmanagement\tsingle\tsecondary\t36\n30\ttechnician\tmarried\ttertiary\t1570\n33\tblue-collar\tmarried\tprimary\t3704\n30\ttechnician\tsingle\ttertiary\t6619\n32\tblue-collar\tsingle\tsecondary\t-84\n31\tself-employed\tmarried\ttertiary\t1134\n33\tmanagement\tsingle\ttertiary\t9449\n30\tmanagement\tsingle\ttertiary\t2\n33\ttechnician\tmarried\ttertiary\t8023\n33\tmanagement\tdivorced\ttertiary\t280\n31\tself-employed\tmarried\tsecondary\t33\n27\tmanagement\tsingle\ttertiary\t703\n32\tentrepreneur\tsingle\ttertiary\t890\n29\tentrepreneur\tmarried\tsecondary\t178\n33\thousemaid\tsingle\ttertiary\t23663\n27\tentrepreneur\tsingle\ttertiary\t81\n28\tmanagement\tsingle\ttertiary\t0\n32\tmanagement\tmarried\ttertiary\t0\n32\tentrepreneur\tmarried\tunknown\t73\n33\tmanagement\tmarried\ttertiary\t1808\n28\tadmin.\tsingle\tunknown\t174\n31\ttechnician\tmarried\tsecondary\t251\n30\ttechnician\tsingle\ttertiary\t985\n28\tservices\tsingle\tsecondary\t168\n30\ttechnician\tsingle\ttertiary\t60\n22\tstudent\tsingle\ttertiary\t1161\n33\tblue-collar\tsingle\tprimary\t599\n29\tservices\tmarried\tsecondary\t3\n32\tmanagement\tdivorced\ttertiary\t874\n33\ttechnician\tsingle\ttertiary\t123\n28\ttechnician\tsingle\ttertiary\t102\n25\tstudent\tsingle\tsecondary\t1790\n30\tadmin.\tsingle\tsecondary\t-635\n31\ttechnician\tsingle\ttertiary\t-162\n32\tmanagement\tmarried\ttertiary\t55\n26\ttechnician\tsingle\tsecondary\t455\n31\tmanagement\tmarried\ttertiary\t1010\n29\tstudent\tsingle\tunknown\t2929\n33\tadmin.\tmarried\tsecondary\t1158\n28\tadmin.\tsingle\tsecondary\t26\n30\tservices\tsingle\tsecondary\t566\n28\tmanagement\tsingle\tsecondary\t1633\n33\tmanagement\tmarried\ttertiary\t4020\n31\tblue-collar\tmarried\tprimary\t352\n32\tadmin.\tsingle\tsecondary\t739\n27\tblue-collar\tsingle\tprimary\t1128\n32\tmanagement\tsingle\ttertiary\t1831\n28\tservices\tmarried\tsecondary\t0\n26\tblue-collar\tsingle\tsecondary\t-32\n26\tmanagement\tsingle\ttertiary\t350\n33\tunemployed\tmarried\tsecondary\t2\n24\tblue-collar\tsingle\tprimary\t111\n28\ttechnician\tsingle\tsecondary\t3\n30\ttechnician\tsingle\tsecondary\t102\n33\tblue-collar\tmarried\tprimary\t0\n33\tblue-collar\tmarried\tsecondary\t1134\n27\tblue-collar\tsingle\tsecondary\t5\n23\tstudent\tmarried\ttertiary\t-230\n26\tstudent\tsingle\tsecondary\t279\n29\tblue-collar\tsingle\tsecondary\t908\n30\tmanagement\tsingle\ttertiary\t162\n30\tblue-collar\tsingle\tsecondary\t445\n32\ttechnician\tsingle\tsecondary\t271\n31\tmanagement\tmarried\tsecondary\t466\n32\tblue-collar\tmarried\tsecondary\t456\n27\tblue-collar\tsingle\tprimary\t1209\n27\tservices\tmarried\tsecondary\t58\n31\tmanagement\tsingle\ttertiary\t112\n31\tentrepreneur\tsingle\ttertiary\t1957\n32\tblue-collar\tsingle\tprimary\t882\n27\tservices\tsingle\tsecondary\t-151\n31\ttechnician\tsingle\ttertiary\t454\n28\ttechnician\tsingle\tsecondary\t-298\n33\tmanagement\tmarried\ttertiary\t148\n32\tblue-collar\tsingle\tsecondary\t-255\n33\tblue-collar\tdivorced\tprimary\t636\n31\thousemaid\tsingle\tprimary\t26965\n33\ttechnician\tsingle\tsecondary\t716\n29\ttechnician\tsingle\ttertiary\t2485\n33\tentrepreneur\tmarried\ttertiary\t595\n30\tmanagement\tsingle\ttertiary\t19358\n31\tself-employed\tsingle\tsecondary\t203\n28\ttechnician\tsingle\ttertiary\t183\n26\tadmin.\tsingle\tsecondary\t255\n31\ttechnician\tsingle\tsecondary\t102\n28\tmanagement\tsingle\ttertiary\t882\n27\tstudent\tsingle\ttertiary\t5291\n31\tblue-collar\tmarried\tsecondary\t1407\n31\ttechnician\tsingle\tsecondary\t25\n31\tblue-collar\tmarried\tsecondary\t1354\n33\ttechnician\tsingle\tsecondary\t5235\n30\ttechnician\tsingle\ttertiary\t3\n28\tservices\tsingle\tsecondary\t198\n31\tblue-collar\tmarried\tprimary\t99\n30\tservices\tsingle\tsecondary\t3485\n33\ttechnician\tdivorced\tsecondary\t9\n33\tmanagement\tmarried\tsecondary\t4040\n32\tself-employed\tsingle\tsecondary\t1259\n25\tadmin.\tmarried\tsecondary\t18\n25\tblue-collar\tmarried\tsecondary\t-76\n32\tblue-collar\tmarried\tsecondary\t-63\n33\tblue-collar\tmarried\tprimary\t511\n32\ttechnician\tdivorced\tsecondary\t1097\n33\tblue-collar\tmarried\tsecondary\t86\n31\tmanagement\tmarried\ttertiary\t8312\n33\tmanagement\tdivorced\tsecondary\t106\n27\tunemployed\tsingle\tsecondary\t3276\n33\tmanagement\tsingle\ttertiary\t3143\n33\tmanagement\tsingle\ttertiary\t1909\n25\tservices\tsingle\tsecondary\t3217\n28\tblue-collar\tsingle\tsecondary\t3412\n32\tblue-collar\tsingle\tsecondary\t604\n31\tadmin.\tmarried\tsecondary\t314\n20\tstudent\tsingle\tsecondary\t291\n31\ttechnician\tsingle\ttertiary\t438\n24\tblue-collar\tmarried\tsecondary\t204\n23\tstudent\tsingle\tsecondary\t8494\n31\tblue-collar\tmarried\tsecondary\t1243\n32\tadmin.\tmarried\ttertiary\t0\n31\tadmin.\tmarried\tsecondary\t0\n32\ttechnician\tmarried\tsecondary\t266\n29\ttechnician\tsingle\tsecondary\t534\n30\tadmin.\tsingle\tsecondary\t81\n27\tblue-collar\tmarried\tsecondary\t872\n25\tservices\tmarried\tsecondary\t72\n30\tadmin.\tmarried\tsecondary\t11\n23\tmanagement\tsingle\ttertiary\t736\n32\tmanagement\tmarried\ttertiary\t1390\n33\tblue-collar\tmarried\tprimary\t1165\n30\tunemployed\tmarried\ttertiary\t0\n30\tmanagement\tsingle\ttertiary\t726\n28\ttechnician\tdivorced\ttertiary\t594\n26\tunemployed\tmarried\ttertiary\t454\n32\ttechnician\tsingle\ttertiary\t0\n26\tservices\tdivorced\tsecondary\t74\n33\tblue-collar\tmarried\tsecondary\t661\n31\tblue-collar\tsingle\tprimary\t-502\n30\tmanagement\tsingle\ttertiary\t-218\n32\ttechnician\tsingle\ttertiary\t1012\n28\tmanagement\tmarried\ttertiary\t1480\n28\tmanagement\tmarried\ttertiary\t318\n28\tmanagement\tsingle\ttertiary\t4937\n32\ttechnician\tmarried\ttertiary\t4089\n32\tmanagement\tsingle\tunknown\t787\n29\tmanagement\tmarried\ttertiary\t877\n32\tadmin.\tsingle\tsecondary\t2817\n26\tservices\tsingle\tsecondary\t127\n27\tmanagement\tsingle\ttertiary\t446\n32\ttechnician\tsingle\ttertiary\t259\n31\tmanagement\tsingle\ttertiary\t62\n29\tunemployed\tsingle\ttertiary\t991\n32\ttechnician\tsingle\ttertiary\t5514\n33\tblue-collar\tmarried\tsecondary\t889\n33\tmanagement\tmarried\ttertiary\t273\n28\tself-employed\tsingle\ttertiary\t4579\n27\tblue-collar\tdivorced\tsecondary\t1\n31\ttechnician\tmarried\ttertiary\t636\n32\tself-employed\tmarried\tsecondary\t-33\n33\tadmin.\tmarried\tsecondary\t-6\n27\ttechnician\tmarried\tsecondary\t130\n30\tblue-collar\tmarried\tsecondary\t6\n33\tblue-collar\tsingle\tsecondary\t706\n28\tmanagement\tmarried\ttertiary\t3694\n23\ttechnician\tsingle\tsecondary\t598\n29\tmanagement\tsingle\ttertiary\t15459\n33\tadmin.\tmarried\ttertiary\t640\n30\tself-employed\tmarried\tsecondary\t1772\n27\tadmin.\tsingle\tsecondary\t15\n27\tservices\tsingle\tsecondary\t201\n32\tadmin.\tdivorced\tsecondary\t5\n30\tblue-collar\tsingle\tsecondary\t75\n33\tadmin.\tmarried\tsecondary\t4902\n27\tblue-collar\tsingle\tprimary\t-79\n32\tservices\tmarried\tsecondary\t-632\n32\tadmin.\tsingle\tsecondary\t116\n31\tblue-collar\tmarried\tprimary\t2\n28\tblue-collar\tsingle\tsecondary\t4229\n27\tservices\tmarried\tsecondary\t54\n22\tstudent\tsingle\tunknown\t549\n33\tservices\tmarried\tsecondary\t90\n33\tmanagement\tdivorced\tsecondary\t1897\n32\tunemployed\tdivorced\tprimary\t0\n33\ttechnician\tmarried\tsecondary\t0\n33\tservices\tsingle\tsecondary\t-56\n30\tblue-collar\tmarried\tprimary\t1\n31\tunemployed\tmarried\ttertiary\t7744\n30\tadmin.\tmarried\tsecondary\t0\n27\ttechnician\tsingle\tsecondary\t158\n30\tadmin.\tmarried\tsecondary\t122\n30\tblue-collar\tmarried\tsecondary\t673\n33\tservices\tdivorced\tsecondary\t411\n32\tmanagement\tmarried\ttertiary\t913\n30\ttechnician\tsingle\ttertiary\t236\n30\tblue-collar\tmarried\tprimary\t2581\n27\tadmin.\tmarried\tsecondary\t639\n32\tmanagement\tsingle\ttertiary\t1218\n31\tmanagement\tmarried\ttertiary\t2603\n24\tmanagement\tsingle\ttertiary\t172\n32\tmanagement\tsingle\ttertiary\t41\n25\tstudent\tsingle\tsecondary\t1116\n30\tmanagement\tsingle\ttertiary\t329\n31\tmanagement\tmarried\tsecondary\t625\n32\tmanagement\tsingle\ttertiary\t151\n30\tmanagement\tmarried\ttertiary\t3134\n27\tself-employed\tsingle\tsecondary\t49\n28\tmanagement\tsingle\ttertiary\t1027\n33\tblue-collar\tdivorced\tprimary\t142\n26\tmanagement\tsingle\ttertiary\t205\n27\tblue-collar\tmarried\tsecondary\t-584\n31\ttechnician\tsingle\tsecondary\t628\n32\tmanagement\tsingle\ttertiary\t311\n26\tblue-collar\tsingle\tsecondary\t856\n31\tservices\tmarried\tsecondary\t413\n27\tadmin.\tmarried\tsecondary\t710\n28\tmanagement\tsingle\tsecondary\t171\n29\tself-employed\tmarried\ttertiary\t751\n23\tstudent\tsingle\tsecondary\t1021\n29\tadmin.\tsingle\tsecondary\t1448\n30\tmanagement\tsingle\ttertiary\t604\n29\tadmin.\tsingle\tsecondary\t-194\n31\ttechnician\tsingle\tsecondary\t1014\n27\tadmin.\tsingle\ttertiary\t73\n28\ttechnician\tsingle\tsecondary\t126\n33\ttechnician\tdivorced\ttertiary\t-386\n28\tmanagement\tsingle\ttertiary\t1466\n24\tadmin.\tmarried\tsecondary\t299\n25\tmanagement\tsingle\ttertiary\t553\n21\tservices\tsingle\tsecondary\t361\n26\ttechnician\tsingle\tsecondary\t2610\n32\tblue-collar\tmarried\tsecondary\t687\n31\tblue-collar\tmarried\tsecondary\t631\n33\ttechnician\tsingle\ttertiary\t316\n29\tblue-collar\tmarried\tsecondary\t912\n31\tblue-collar\tmarried\tsecondary\t0\n29\ttechnician\tsingle\ttertiary\t452\n28\tadmin.\tmarried\tsecondary\t-97\n32\tstudent\tsingle\ttertiary\t0\n33\tblue-collar\tsingle\tsecondary\t13494\n30\tblue-collar\tmarried\tsecondary\t501\n32\tself-employed\tmarried\tsecondary\t413\n32\ttechnician\tsingle\ttertiary\t4665\n32\tblue-collar\tmarried\tsecondary\t101\n31\tmanagement\tmarried\ttertiary\t1224\n29\tservices\tmarried\tsecondary\t3748\n30\tadmin.\tmarried\tsecondary\t518\n33\tmanagement\tmarried\ttertiary\t3696\n31\ttechnician\tsingle\tsecondary\t433\n33\tunknown\tmarried\tsecondary\t2727\n31\tblue-collar\tmarried\tsecondary\t1766\n33\tadmin.\tmarried\ttertiary\t69\n29\tblue-collar\tsingle\tsecondary\t9\n31\tservices\tmarried\tsecondary\t428\n31\tblue-collar\tmarried\tprimary\t620\n29\ttechnician\tsingle\tsecondary\t113\n33\tentrepreneur\tmarried\tprimary\t82\n27\tunknown\tsingle\ttertiary\t6421\n26\tadmin.\tsingle\tsecondary\t443\n27\tservices\tsingle\tsecondary\t-124\n31\tblue-collar\tmarried\tsecondary\t79\n30\tservices\tmarried\tsecondary\t1743\n30\tadmin.\tmarried\tsecondary\t124\n27\tadmin.\tsingle\tsecondary\t3638\n30\tblue-collar\tmarried\tsecondary\t-99\n32\ttechnician\tmarried\tsecondary\t167\n29\tself-employed\tmarried\ttertiary\t242\n32\ttechnician\tmarried\tsecondary\t286\n31\tblue-collar\tsingle\tsecondary\t16\n29\tmanagement\tsingle\tsecondary\t417\n33\ttechnician\tmarried\tsecondary\t133\n32\tblue-collar\tsingle\tsecondary\t1721\n32\ttechnician\tsingle\tsecondary\t2979\n31\tadmin.\tdivorced\tsecondary\t1210\n22\tstudent\tsingle\tunknown\t47\n32\tservices\tsingle\tunknown\t6145\n33\tblue-collar\tmarried\tprimary\t245\n33\tmanagement\tsingle\ttertiary\t1998\n28\tstudent\tsingle\ttertiary\t1562\n29\tadmin.\tsingle\tsecondary\t3432\n31\tadmin.\tsingle\tsecondary\t144\n28\tblue-collar\tdivorced\tunknown\t101\n29\ttechnician\tsingle\ttertiary\t406\n26\tblue-collar\tmarried\tsecondary\t484\n30\tservices\tsingle\ttertiary\t3516\n31\tadmin.\tsingle\tsecondary\t1306\n26\tblue-collar\tmarried\tsecondary\t245\n29\tself-employed\tsingle\tsecondary\t3672\n32\ttechnician\tsingle\tsecondary\t29\n32\ttechnician\tmarried\tsecondary\t84\n25\tstudent\tmarried\ttertiary\t0\n32\tmanagement\tmarried\tsecondary\t6217\n32\tblue-collar\tmarried\tprimary\t329\n32\ttechnician\tmarried\tunknown\t14533\n33\tmanagement\tsingle\tsecondary\t8004\n29\tmanagement\tdivorced\ttertiary\t415\n33\tblue-collar\tmarried\tsecondary\t249\n31\tblue-collar\tmarried\tsecondary\t897\n32\tmanagement\tdivorced\ttertiary\t1\n33\tblue-collar\tmarried\tsecondary\t687\n27\tentrepreneur\tsingle\tsecondary\t376\n27\tblue-collar\tsingle\tsecondary\t23\n33\tadmin.\tmarried\tsecondary\t353\n29\tservices\tdivorced\tsecondary\t330\n33\tmanagement\tdivorced\ttertiary\t0\n30\tmanagement\tmarried\ttertiary\t0\n23\ttechnician\tsingle\tsecondary\t-306\n32\ttechnician\tsingle\tsecondary\t493\n32\tmanagement\tmarried\ttertiary\t71\n32\tmanagement\tmarried\ttertiary\t4761\n33\tblue-collar\tmarried\tsecondary\t-346\n28\tunemployed\tmarried\tsecondary\t655\n31\tservices\tsingle\tsecondary\t0\n32\ttechnician\tsingle\ttertiary\t569\n33\tself-employed\tmarried\ttertiary\t263\n32\ttechnician\tsingle\tsecondary\t0\n31\tservices\tmarried\tsecondary\t1062\n28\tmanagement\tsingle\ttertiary\t3238\n31\tmanagement\tsingle\ttertiary\t3283\n29\tunemployed\tsingle\tsecondary\t486\n25\tstudent\tsingle\tsecondary\t304\n32\tblue-collar\tsingle\tsecondary\t118\n30\tself-employed\tmarried\tsecondary\t123\n32\ttechnician\tsingle\ttertiary\t2185\n29\tblue-collar\tsingle\tsecondary\t309\n30\tblue-collar\tsingle\tsecondary\t4\n20\tstudent\tsingle\tsecondary\t1191\n27\tservices\tsingle\tsecondary\t795\n29\tmanagement\tsingle\ttertiary\t1445\n32\tmanagement\tmarried\ttertiary\t-55\n30\tblue-collar\tmarried\tprimary\t-336\n26\tadmin.\tsingle\ttertiary\t3672\n29\tadmin.\tsingle\tsecondary\t1992\n32\tblue-collar\tsingle\tsecondary\t2\n31\ttechnician\tsingle\tsecondary\t1094\n28\tmanagement\tsingle\ttertiary\t781\n32\ttechnician\tsingle\ttertiary\t13711\n31\tblue-collar\tsingle\tsecondary\t-219\n32\tblue-collar\tmarried\tsecondary\t300\n31\tadmin.\tmarried\tsecondary\t0\n31\ttechnician\tsingle\tsecondary\t125\n30\tservices\tsingle\tsecondary\t432\n31\tservices\tsingle\tsecondary\t1987\n"
+      },
+      "dateCreated": "Apr 2, 2015 4:08:14 AM",
+      "dateStarted": "Nov 7, 2016 5:27:49 AM",
+      "dateFinished": "Nov 7, 2016 5:27:49 AM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "",
+      "text": "%sql select marital, count(1) from bank group by marital",
+      "dateUpdated": "Jan 25, 2016 9:48:28 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "multiBarChart",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "marital",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [
+            {
+              "name": "_c1",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          ],
+          "groups": [
+            {
+              "name": "marital",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "scatter": {
+            "xAxis": {
+              "name": "marital",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          }
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1427958518101_-925902856",
+      "id": "20150402-160838_1539206505",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "marital\t_c1\ndivorced\t5207\nsingle\t12790\nmarried\t27214\n"
+      },
+      "dateCreated": "Apr 2, 2015 4:08:38 AM",
+      "dateStarted": "Jan 25, 2016 9:44:14 AM",
+      "dateFinished": "Jan 25, 2016 9:44:18 AM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "",
+      "text": "import org.apache.spark.streaming._\nimport org.apache.spark.streaming.twitter._\nimport org.apache.spark.storage.StorageLevel\nimport scala.io.Source\nimport scala.collection.mutable.HashMap\nimport java.io.File\nimport org.apache.log4j.Logger\nimport org.apache.log4j.Level\n\n/** Configures the Oauth Credentials for accessing Twitter */\ndef configureTwitterCredentials(apiKey: String, apiSecret: String, accessToken: String, accessTokenSecret: String) {\nval configs \u003d new HashMap[String, String] ++\u003d Seq(\n \"apiKey\" -\u003e apiKey, \"apiSecret\" -\u003e apiSecret, \"accessToken\" -\u003e accessToken, \"accessTokenSecret\" -\u003e accessTokenSecret)\nprintln(\"Configuring Twitter OAuth\")\nconfigs.foreach{ case(key, value) \u003d\u003e\n if (value.trim.isEmpty) {\n throw new Exception(\"Error setting authentication - value for \" + key + \" not set\")\n }\n val fullKey \u003d \"twitter4j.oauth.\" + key.replace(\"api\", \"consumer\")\n System.setProperty(fullKey, value.trim)\n println(\"\\tProperty \" + fullKey + \" set as [\" + value.trim + \"]\")\n}\nprintln()\n}\n\n// Configure Twitter credentials\nval apiKey \u003d \"AyoSScE6vkuMfkUezuwCausOw\"\nval apiSecret \u003d \"qoz0rJOkrE5RVBkyNnbQ8pjkK4iUUXOmX5QTC32SuFUXdmvRjA\"\nval accessToken \u003d \"7706702-1TQCBL4xX8TS7RSnTyG9zLXKbdp7Dz3IlScl5Ciaa5\"\nval accessTokenSecret \u003d \"2kig2sNWjMNEvv8jQZeIcmjXxre9oekb9Z1sZEVIkOmUE\"\nconfigureTwitterCredentials(apiKey, apiSecret, accessToken, accessTokenSecret)\n\nimport org.apache.spark.streaming.twitter._\nval ssc \u003d new StreamingContext(sc, Seconds(2))\nval tweets \u003d TwitterUtils.createStream(ssc, None)\nval twt \u003d tweets.window(Seconds(60))\n\n//import org.elasticsearch.hadoop.cfg.ConfigurationOptions\n//import org.elasticsearch.spark._\n\ncase class Tweet(createdAt:Long, text:String)\ntwt.map(status\u003d\u003e\n Tweet(status.getCreatedAt().getTime()/1000, status.getText())\n).foreachRDD(rdd\u003d\u003e\n rdd.toDF.registerTempTable(\"tweets\")\n)\n\n/*\ntwt.map(status\u003d\u003e\n Map(\"date\"-\u003estatus.getCreatedAt(), \"text\"-\u003estatus.getText())\n).foreachRDD(rdd\u003d\u003e\n rdd.saveToEs(Map(ConfigurationOptions.ES_NODES-\u003e\"kiwi.nflabs.com:9200\", ConfigurationOptions.ES_RESOURCE_WRITE-\u003e\"test/status\"))\n)\n*/\ntwt.print\nssc.start()",
+      "dateUpdated": "Jan 25, 2016 9:50:13 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "tableHide": true,
+        "editorHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1427958541799_243211134",
+      "id": "20150402-160901_1712241178",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "import org.apache.spark.streaming._\nimport org.apache.spark.streaming.twitter._\nimport org.apache.spark.storage.StorageLevel\nimport scala.io.Source\nimport scala.collection.mutable.HashMap\nimport java.io.File\nimport org.apache.log4j.Logger\nimport org.apache.log4j.Level\nconfigureTwitterCredentials: (apiKey: String, apiSecret: String, accessToken: String, accessTokenSecret: String)Unit\napiKey: String \u003d AyoSScE6vkuMfkUezuwCausOw\napiSecret: String \u003d qoz0rJOkrE5RVBkyNnbQ8pjkK4iUUXOmX5QTC32SuFUXdmvRjA\naccessToken: String \u003d 7706702-1TQCBL4xX8TS7RSnTyG9zLXKbdp7Dz3IlScl5Ciaa5\naccessTokenSecret: String \u003d 2kig2sNWjMNEvv8jQZeIcmjXxre9oekb9Z1sZEVIkOmUE\nConfiguring Twitter OAuth\n\tProperty twitter4j.oauth.consumerKey set as [AyoSScE6vkuMfkUezuwCausOw]\n\tProperty twitter4j.oauth.accessToken set as [7706702-1TQCBL4xX8TS7RSnTyG9zLXKbdp7Dz3IlScl5Ciaa5]\n\tProperty twitter4j.oauth.consumerSecret set as [qoz0rJOkrE5RVBkyNnbQ8pjkK4iUUXOmX5QTC32SuFUXdmvRjA]\n\tProperty twitter4j.oauth.accessTokenSecret set as [2kig2sNWjMNEvv8jQZeIcmjXxre9oekb9Z1sZEVIkOmUE]\n\nimport org.apache.spark.streaming.twitter._\nssc: org.apache.spark.streaming.StreamingContext \u003d org.apache.spark.streaming.StreamingContext@2130ede\ntweets: org.apache.spark.streaming.dstream.ReceiverInputDStream[twitter4j.Status] \u003d org.apache.spark.streaming.twitter.TwitterInputDStream@7a524be5\ntwt: org.apache.spark.streaming.dstream.DStream[twitter4j.Status] \u003d org.apache.spark.streaming.dstream.WindowedDStream@120f431a\ndefined class Tweet\n"
+      },
+      "dateCreated": "Apr 2, 2015 4:09:01 AM",
+      "dateStarted": "Jan 25, 2016 9:44:15 AM",
+      "dateFinished": "Jan 25, 2016 9:44:30 AM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "",
+      "text": "%sql select * from tweets where text like \u0027%girl%\u0027 limit 100",
+      "dateUpdated": "Jan 25, 2016 9:50:17 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "createdAt",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [
+            {
+              "name": "text",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          ],
+          "groups": [],
+          "scatter": {
+            "xAxis": {
+              "name": "createdAt",
+              "index": 0.0,
+              "aggr": "sum"
+            },
+            "yAxis": {
+              "name": "text",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          }
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/sql",
+        "tableHide": true,
+        "editorHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1427958629375_-1765239421",
+      "id": "20150402-161029_916199065",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "createdAt\ttext\n1453787137\tRT @BlackPplLaughs: When Mexican girls finally get the joke😂😂😂\nhttps://t.co/OeafiCv4JG\n1453787140\tRT @meg_krajewski: dudes always try and flame the girl when in reality their shit weak as hell..........lol\n1453787146\t@baehannna @jazminamorr yeah push harder for ya stats girl\n1453787151\tRT @ellegirl_jp: 9/23発売の #ELLEgirl 11月号に #2PM の弟分グループ、#GOT7 が初登場！ ガッセメンバーのキュートなからみ写真やインタビューをお楽しみに♡ #딱좋아 #IGOT7 #LAUGHLAUGHLAUGH http://t.co…\n1453787156\t👉https://t.co/PYmYyz7ria👈 Hot girls in your area for  free ✅ Join now 🔞\n #olom #online\n1453787157\t✅ Free datings for sex 🔞 Only hot girls to sex with! 👉https://t.co/eeGJXm6H6b👈\n  #bikini #femdom\n1453787158\tRT @stocckholm: nao consigo ver leighton meester fazendo outras personagem pra mim ela sempre vai ser a eterna blair waldorf #gossipgirlday\n1453787160\t@gxldenprincesss blonde highlights babygirl!!! 😍\n1453787162\tRT @EthanIsALame: make sure ya girl is also your best friend\n1453787164\tRT @TheNiqSter74: I just need my girlfriennnnd\n1453787170\t@Jeanettegirl you love me\n1453787176\t@sassygirl3683 thank you baby!\n1453787183\tRT @dmndprncess_: my bf don\u0027t need girl friends I\u0027m his best friend 😛 I have 60 personalities anyways 😂 chose what friend you want today ba…\n1453787192\tGimme head and kiss yo girl, you\u0027s a ill bitch.\n"
+      },
+      "dateCreated": "Apr 2, 2015 4:10:29 AM",
+      "dateStarted": "Jan 25, 2016 9:46:35 AM",
+      "dateFinished": "Jan 25, 2016 9:46:36 AM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "",
+      "text": "def sentiment(s:String) : String \u003d {\n val positive \u003d Array(\"like\", \"love\", \"good\", \"great\", \"happy\", \"cool\", \"the\", \"one\", \"that\")\n val negative \u003d Array(\"hate\", \"bad\", \"stupid\", \"is\")\n\n var st \u003d 0;\n\n val words \u003d s.split(\" \") \n positive.foreach(p \u003d\u003e\n words.foreach(w \u003d\u003e\n if(p\u003d\u003dw) st \u003d st+1\n )\n)\n\n negative.foreach(p\u003d\u003e\n words.foreach(w\u003d\u003e\n if(p\u003d\u003dw) st \u003d st-1\n)\n )\n if(st\u003e0)\n \"positive\"\n else if(st\u003c0)\n \"negative\"\n else\n \"neutral\"\n}\nsqlc.udf.register(\"sentiment\", sentiment _)",
+      "dateUpdated": "Jan 25, 2016 9:50:49 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": true,
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1427958762299_-1965926750",
+      "id": "20150402-161242_778123638",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "sentiment: (s: String)String\nres20: org.apache.spark.sql.UserDefinedFunction \u003d UserDefinedFunction(\u003cfunction1\u003e,StringType)\n-------------------------------------------\nTime: 1453787270000 ms\n-------------------------------------------\nStatusJSONImpl{createdAt\u003dMon Jan 25 21:46:50 PST 2016, id\u003d691859823294574592, text\u003d\u0027RT @AlDubBigBoyz: An insider from People Asia Awards Night. She witnessed everything :) thanks for the scoops\n\n#ALDUBLihimNgKahapon https:/…\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/android\" rel\u003d\"nofollow\"\u003eTwitter for Android\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d0, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@6e8013a1, retweetedStatus\u003dStatusJSONImpl{createdAt\u003dMon Jan 25 17:33:42 PST 2016, id\u003d691796120960421888, text\u003d\u0027An insider from People Asia Awards Night. She witnessed everything :) thanks for the scoops\n\n#ALDUBLihimNgKahapon https://t.co/lAyx9HEtWx\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/iphone\" rel\u003d\"nofollow\"\u003eTwitter for iPhone\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d1133, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@1a88e7b4, retweetedStatus\u003dnull, userMentionEntities\u003d[], urlEntities\u003d[], hashtagEntities\u003d[HashtagEntityJSONImpl{text\u003d\u0027ALDUBLihimNgKahapon\u0027}], mediaEntities\u003d[MediaEntityJSONImpl{id\u003d691796100395720705, url\u003dhttps://t.co/lAyx9HEtWx, mediaURL\u003dhttp://pbs.twimg.com/media/CZnA41UWYAE5lTk.jpg, mediaURLHttps\u003dhttps://pbs.twimg.com/media/CZnA41UWYAE5lTk.jpg, expandedURL\u003dhttp://twitter.com/AlDubBigBoyz/status/691796120960421888/photo/1, displayURL\u003d\u0027pic.twitter.com/lAyx9HEtWx\u0027, sizes\u003d{0\u003dSize{width\u003d150, height\u003d150, resize\u003d101}, 1\u003dSize{width\u003d340, height\u003d574, resize\u003d100}, 2\u003dSize{width\u003d599, height\u003d1013, resize\u003d100}, 3\u003dSize{width\u003d599, height\u003d1013, resize\u003d100}}, type\u003dphoto}], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d3309489938, name\u003d\u0027AlDubForTheBigBoyz™\u0027, screenName\u003d\u0027AlDubBigBoyz\u0027, location\u003d\u0027OUTER SPACE\u0027, description\u003d\u0027WE WOULD RATHER BE HONEST THAN IMPRESSIVE. REPLY WITH CLASS. We ship @mainedcm \u0026 @aldenrichards02 • Member of Official ALDUB Trendsetter @ofctrendsetter\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/691563864152940544/RKSyu7Y-_normal.jpg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/691563864152940544/RKSyu7Y-_normal.jpg\u0027, url\u003d\u0027https://m.facebook.com/aldubbigboyz/\u0027, isProtected\u003dfalse, followersCount\u003d51806, status\u003dnull, profileBackgroundColor\u003d\u0027000000\u0027, profileTextColor\u003d\u0027000000\u0027, profileLinkColor\u003d\u002789C9FA\u0027, profileSidebarFillColor\u003d\u0027000000\u0027, profileSidebarBorderColor\u003d\u0027000000\u0027, profileUseBackgroundImage\u003dfalse, showAllInlineMedia\u003dfalse, friendsCount\u003d183, createdAt\u003dSat Aug 08 01:37:49 PDT 2015, favouritesCount\u003d753, utcOffset\u003d-28800, timeZone\u003d\u0027Pacific Time (US \u0026 Canada)\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027en\u0027, statusesCount\u003d66853, isGeoEnabled\u003dfalse, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d24, isFollowRequestSent\u003dfalse}}, userMentionEntities\u003d[UserMentionEntityJSONImpl{name\u003d\u0027AlDubForTheBigBoyz™\u0027, screenName\u003d\u0027AlDubBigBoyz\u0027, id\u003d3309489938}], urlEntities\u003d[], hashtagEntities\u003d[HashtagEntityJSONImpl{text\u003d\u0027ALDUBLihimNgKahapon\u0027}], mediaEntities\u003d[MediaEntityJSONImpl{id\u003d691796100395720705, url\u003dhttps://t.co/lAyx9HEtWx, mediaURL\u003dhttp://pbs.twimg.com/media/CZnA41UWYAE5lTk.jpg, mediaURLHttps\u003dhttps://pbs.twimg.com/media/CZnA41UWYAE5lTk.jpg, expandedURL\u003dhttp://twitter.com/AlDubBigBoyz/status/691796120960421888/photo/1, displayURL\u003d\u0027pic.twitter.com/lAyx9HEtWx\u0027, sizes\u003d{0\u003dSize{width\u003d150, height\u003d150, resize\u003d101}, 1\u003dSize{width\u003d340, height\u003d574, resize\u003d100}, 2\u003dSize{width\u003d599, height\u003d1013, resize\u003d100}, 3\u003dSize{width\u003d599, height\u003d1013, resize\u003d100}}, type\u003dphoto}], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d4451523921, name\u003d\u0027Raymond Aquino\u0027, screenName\u003d\u0027aldubraymon07\u0027, location\u003d\u0027Jeddah Kingdom of Saudi Arabia\u0027, description\u003d\u0027null\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/675403032599859200/RiahnqNW_normal.jpg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/675403032599859200/RiahnqNW_normal.jpg\u0027, url\u003d\u0027null\u0027, isProtected\u003dfalse, followersCount\u003d171, status\u003dnull, profileBackgroundColor\u003d\u0027F5F8FA\u0027, profileTextColor\u003d\u0027333333\u0027, profileLinkColor\u003d\u00272B7BB9\u0027, profileSidebarFillColor\u003d\u0027DDEEF6\u0027, profileSidebarBorderColor\u003d\u0027C0DEED\u0027, profileUseBackgroundImage\u003dtrue, showAllInlineMedia\u003dfalse, friendsCount\u003d779, createdAt\u003dFri Dec 11 11:35:37 PST 2015, favouritesCount\u003d5456, utcOffset\u003d-1, timeZone\u003d\u0027null\u0027, profileBackgroundImageUrl\u003d\u0027\u0027, profileBackgroundImageUrlHttps\u003d\u0027\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027en\u0027, statusesCount\u003d11459, isGeoEnabled\u003dfalse, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d3, isFollowRequestSent\u003dfalse}}\nStatusJSONImpl{createdAt\u003dMon Jan 25 21:46:50 PST 2016, id\u003d691859823282012160, text\u003d\u0027合図があれば息堪えから脱出しやすい。合図というのは注意転換のことかも。。注意というか、意識の注意は他のところにやるのは不安定。。触れないし。。もし本番で出来なかったとき、こまる。\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/iphone\" rel\u003d\"nofollow\"\u003eTwitter for iPhone\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d0, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@73566e85, retweetedStatus\u003dnull, userMentionEntities\u003d[], urlEntities\u003d[], hashtagEntities\u003d[], mediaEntities\u003d[], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d3516309972, name\u003d\u0027らぷ\u0027, screenName\u003d\u0027rumpcake\u0027, location\u003d\u0027null\u0027, description\u003d\u0027わし 吃音めも\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/688424311120498688/q-wG0E1S_normal.jpg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/688424311120498688/q-wG0E1S_normal.jpg\u0027, url\u003d\u0027null\u0027, isProtected\u003dfalse, followersCount\u003d0, status\u003dnull, profileBackgroundColor\u003d\u0027C0DEED\u0027, profileTextColor\u003d\u0027333333\u0027, profileLinkColor\u003d\u00270084B4\u0027, profileSidebarFillColor\u003d\u0027DDEEF6\u0027, profileSidebarBorderColor\u003d\u0027C0DEED\u0027, profileUseBackgroundImage\u003dtrue, showAllInlineMedia\u003dfalse, friendsCount\u003d0, createdAt\u003dThu Sep 10 07:34:36 PDT 2015, favouritesCount\u003d0, utcOffset\u003d-1, timeZone\u003d\u0027null\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027ja\u0027, statusesCount\u003d54, isGeoEnabled\u003dfalse, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d0, isFollowRequestSent\u003dfalse}}\nStatusJSONImpl{createdAt\u003dMon Jan 25 21:46:50 PST 2016, id\u003d691859823281991684, text\u003d\u0027Para estar mas fresquitaaaa😊😊😊\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/android\" rel\u003d\"nofollow\"\u003eTwitter for Android\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d0, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@2f7218eb, retweetedStatus\u003dnull, userMentionEntities\u003d[], urlEntities\u003d[], hashtagEntities\u003d[], mediaEntities\u003d[], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d1486354135, name\u003d\u0027Loli♡\u0027, screenName\u003d\u0027LoliVicentte\u0027, location\u003d\u0027Beccar\u0027, description\u003d\u0027Juntas a la par ❤\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/653386612865372160/NzCyt7qd_normal.jpg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/653386612865372160/NzCyt7qd_normal.jpg\u0027, url\u003d\u0027null\u0027, isProtected\u003dfalse, followersCount\u003d747, status\u003dnull, profileBackgroundColor\u003d\u0027ACDED6\u0027, profileTextColor\u003d\u0027333333\u0027, profileLinkColor\u003d\u0027038543\u0027, profileSidebarFillColor\u003d\u0027F6F6F6\u0027, profileSidebarBorderColor\u003d\u0027EEEEEE\u0027, profileUseBackgroundImage\u003dtrue, showAllInlineMedia\u003dfalse, friendsCount\u003d622, createdAt\u003dWed Jun 05 16:52:47 PDT 2013, favouritesCount\u003d1318, utcOffset\u003d-10800, timeZone\u003d\u0027Buenos Aires\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme18/bg.gif\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme18/bg.gif\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027es\u0027, statusesCount\u003d18450, isGeoEnabled\u003dtrue, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d3, isFollowRequestSent\u003dfalse}}\nStatusJSONImpl{createdAt\u003dMon Jan 25 21:46:50 PST 2016, id\u003d691859823298748416, text\u003d\u0027RT @PBieberFollow: desligaram o Wi-Fi, que triste #BieberBestFans2016\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/android\" rel\u003d\"nofollow\"\u003eTwitter for Android\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d0, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@6bc204a2, retweetedStatus\u003dStatusJSONImpl{createdAt\u003dMon Jan 25 21:06:15 PST 2016, id\u003d691849610315337728, text\u003d\u0027desligaram o Wi-Fi, que triste #BieberBestFans2016\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/iphone\" rel\u003d\"nofollow\"\u003eTwitter for iPhone\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dPlaceJSONImpl{name\u003d\u0027Itaquaquecetuba\u0027, streetAddress\u003d\u0027null\u0027, countryCode\u003d\u0027BR\u0027, id\u003d\u0027b3b4cdbac4fca873\u0027, country\u003d\u0027Brasil\u0027, placeType\u003d\u0027city\u0027, url\u003d\u0027https://api.twitter.com/1.1/geo/id/b3b4cdbac4fca873.json\u0027, fullName\u003d\u0027Itaquaquecetuba, São Paulo\u0027, boundingBoxType\u003d\u0027Polygon\u0027, boundingBoxCoordinates\u003d[[Ltwitter4j.GeoLocation;@744bab14], geometryType\u003d\u0027null\u0027, geometryCoordinates\u003dnull, containedWithIn\u003dnull}, retweetCount\u003d8, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@13cce9b2, retweetedStatus\u003dnull, userMentionEntities\u003d[], urlEntities\u003d[], hashtagEntities\u003d[HashtagEntityJSONImpl{text\u003d\u0027BieberBestFans2016\u0027}], mediaEntities\u003d[], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d3298133953, name\u003d\u0027ProjetoBieberFollow\u0027, screenName\u003d\u0027PBieberFollow\u0027, location\u003d\u0027São Paulo, Brasil\u0027, description\u003d\u0027Projeto para ajudar beliebers a conseguirem o follow do @justinbieber e nas votações.Ativem as notificações/Rt nos meus tweets. Team Support Bieber. +1.7K\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/665528038654914561/RHdbsy2F_normal.jpg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/665528038654914561/RHdbsy2F_normal.jpg\u0027, url\u003d\u0027http://smarturl.it/JBPurpose\u0027, isProtected\u003dfalse, followersCount\u003d14827, status\u003dnull, profileBackgroundColor\u003d\u0027ACDED6\u0027, profileTextColor\u003d\u0027000000\u0027, profileLinkColor\u003d\u002789C9FA\u0027, profileSidebarFillColor\u003d\u0027000000\u0027, profileSidebarBorderColor\u003d\u0027000000\u0027, profileUseBackgroundImage\u003dtrue, showAllInlineMedia\u003dfalse, friendsCount\u003d10860, createdAt\u003dMon Jul 27 09:23:23 PDT 2015, favouritesCount\u003d7267, utcOffset\u003d-28800, timeZone\u003d\u0027Pacific Time (US \u0026 Canada)\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme18/bg.gif\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme18/bg.gif\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027pt\u0027, statusesCount\u003d11289, isGeoEnabled\u003dtrue, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d8, isFollowRequestSent\u003dfalse}}, userMentionEntities\u003d[UserMentionEntityJSONImpl{name\u003d\u0027ProjetoBieberFollow\u0027, screenName\u003d\u0027PBieberFollow\u0027, id\u003d3298133953}], urlEntities\u003d[], hashtagEntities\u003d[HashtagEntityJSONImpl{text\u003d\u0027BieberBestFans2016\u0027}], mediaEntities\u003d[], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d3988191017, name\u003d\u0027Gabii\u0027, screenName\u003d\u0027GabiiFavaro\u0027, location\u003d\u0027null\u0027, description\u003d\u0027I Am Biba Fan Pothead Life Destination Delight My Everything\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/690598736842616833/ulqWwfZR_normal.jpg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/690598736842616833/ulqWwfZR_normal.jpg\u0027, url\u003d\u0027null\u0027, isProtected\u003dfalse, followersCount\u003d200, status\u003dnull, profileBackgroundColor\u003d\u0027C0DEED\u0027, profileTextColor\u003d\u0027333333\u0027, profileLinkColor\u003d\u00270084B4\u0027, profileSidebarFillColor\u003d\u0027DDEEF6\u0027, profileSidebarBorderColor\u003d\u0027C0DEED\u0027, profileUseBackgroundImage\u003dtrue, showAllInlineMedia\u003dfalse, friendsCount\u003d683, createdAt\u003dSun Oct 18 09:26:09 PDT 2015, favouritesCount\u003d201, utcOffset\u003d-1, timeZone\u003d\u0027null\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027pt\u0027, statusesCount\u003d459, isGeoEnabled\u003dfalse, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d0, isFollowRequestSent\u003dfalse}}\nStatusJSONImpl{createdAt\u003dMon Jan 25 21:46:50 PST 2016, id\u003d691859823294562306, text\u003d\u0027I love making money\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/iphone\" rel\u003d\"nofollow\"\u003eTwitter for iPhone\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d0, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@7202af45, retweetedStatus\u003dnull, userMentionEntities\u003d[], urlEntities\u003d[], hashtagEntities\u003d[], mediaEntities\u003d[], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d772357956, name\u003d\u0027Travis Decker\u0027, screenName\u003d\u0027TravisDecker\u0027, location\u003d\u0027null\u0027, description\u003d\u0027if your dreams don\u0027t scare you then they probably aren\u0027t big enough\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/684219234205970432/Vj66_mCX_normal.jpg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/684219234205970432/Vj66_mCX_normal.jpg\u0027, url\u003d\u0027null\u0027, isProtected\u003dfalse, followersCount\u003d878, status\u003dnull, profileBackgroundColor\u003d\u0027C0DEED\u0027, profileTextColor\u003d\u0027333333\u0027, profileLinkColor\u003d\u00270084B4\u0027, profileSidebarFillColor\u003d\u0027DDEEF6\u0027, profileSidebarBorderColor\u003d\u0027C0DEED\u0027, profileUseBackgroundImage\u003dtrue, showAllInlineMedia\u003dfalse, friendsCount\u003d452, createdAt\u003dTue Aug 21 15:09:49 PDT 2012, favouritesCount\u003d9875, utcOffset\u003d-1, timeZone\u003d\u0027null\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027en\u0027, statusesCount\u003d17563, isGeoEnabled\u003dfalse, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d0, isFollowRequestSent\u003dfalse}}\nStatusJSONImpl{createdAt\u003dMon Jan 25 21:46:50 PST 2016, id\u003d691859823290400768, text\u003d\u0027#AustraliaDay 😍😍\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/iphone\" rel\u003d\"nofollow\"\u003eTwitter for iPhone\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d0, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@e41157d, retweetedStatus\u003dnull, userMentionEntities\u003d[], urlEntities\u003d[], hashtagEntities\u003d[HashtagEntityJSONImpl{text\u003d\u0027AustraliaDay\u0027}], mediaEntities\u003d[], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d598787777, name\u003d\u0027Marc Old\u0027, screenName\u003d\u0027marc_old\u0027, location\u003d\u0027null\u0027, description\u003d\u0027null\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/424162874039103488/T2ewNudc_normal.jpeg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/424162874039103488/T2ewNudc_normal.jpeg\u0027, url\u003d\u0027null\u0027, isProtected\u003dfalse, followersCount\u003d269, status\u003dnull, profileBackgroundColor\u003d\u0027C0DEED\u0027, profileTextColor\u003d\u0027333333\u0027, profileLinkColor\u003d\u00270084B4\u0027, profileSidebarFillColor\u003d\u0027DDEEF6\u0027, profileSidebarBorderColor\u003d\u0027C0DEED\u0027, profileUseBackgroundImage\u003dtrue, showAllInlineMedia\u003dfalse, friendsCount\u003d1193, createdAt\u003dSun Jun 03 17:35:00 PDT 2012, favouritesCount\u003d10, utcOffset\u003d-1, timeZone\u003d\u0027null\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027en\u0027, statusesCount\u003d341, isGeoEnabled\u003dfalse, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d0, isFollowRequestSent\u003dfalse}}\nStatusJSONImpl{createdAt\u003dMon Jan 25 21:46:50 PST 2016, id\u003d691859823269433345, text\u003d\u0027@JuicyBeaxx : I go to the doctor next week! Thank you Bre! 🤗\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/iphone\" rel\u003d\"nofollow\"\u003eTwitter for iPhone\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d691858990242893826, inReplyToUserId\u003d536701688, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027JuicyBeaxx\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d0, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@72818abc, retweetedStatus\u003dnull, userMentionEntities\u003d[UserMentionEntityJSONImpl{name\u003d\u0027aqυarιυѕ 02.02\u0027, screenName\u003d\u0027JuicyBeaxx\u0027, id\u003d536701688}], urlEntities\u003d[], hashtagEntities\u003d[], mediaEntities\u003d[], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d2374751473, name\u003d\u0027Miracle♡\u0027, screenName\u003d\u0027miraclemarisha\u0027, location\u003d\u0027somewhere w/ @eazy__e13❤️\u0027, description\u003d\u0027Miracle\u0026Everett❤ | LHS \u002716 | DANCER•Dazzlin Dymes | Snapchat: miraclemalone | 010915\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/667537184933683204/oCMy0boA_normal.jpg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/667537184933683204/oCMy0boA_normal.jpg\u0027, url\u003d\u0027null\u0027, isProtected\u003dfalse, followersCount\u003d351, status\u003dnull, profileBackgroundColor\u003d\u0027C0DEED\u0027, profileTextColor\u003d\u0027333333\u0027, profileLinkColor\u003d\u00270084B4\u0027, profileSidebarFillColor\u003d\u0027DDEEF6\u0027, profileSidebarBorderColor\u003d\u0027C0DEED\u0027, profileUseBackgroundImage\u003dtrue, showAllInlineMedia\u003dfalse, friendsCount\u003d203, createdAt\u003dWed Mar 05 19:35:15 PST 2014, favouritesCount\u003d544, utcOffset\u003d-1, timeZone\u003d\u0027null\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027en\u0027, statusesCount\u003d4768, isGeoEnabled\u003dfalse, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d0, isFollowRequestSent\u003dfalse}}\nStatusJSONImpl{createdAt\u003dMon Jan 25 21:46:50 PST 2016, id\u003d691859823294599169, text\u003d\u0027Yg mau gabung di bazaar HUT 30 thn bengawan sport | kuliner n\u0027 non kuliner|01-03 April\u002716| info: pin 29DA0584 WA 085799558802 @EventSoloRaya\u0027, source\u003d\u0027\u003ca href\u003d\"http://blackberry.com/twitter\" rel\u003d\"nofollow\"\u003eTwitter for BlackBerry®\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d0, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@16bb775f, retweetedStatus\u003dnull, userMentionEntities\u003d[UserMentionEntityJSONImpl{name\u003d\u0027Event Solo\u0027, screenName\u003d\u0027EventSoloRaya\u0027, id\u003d609207464}], urlEntities\u003d[], hashtagEntities\u003d[], mediaEntities\u003d[], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d2386386392, name\u003d\u0027Bengawan Sport Solo\u0027, screenName\u003d\u0027bengawansport\u0027, location\u003d\u0027Jl. HOS Cokroaminoto 55 Solo\u0027, description\u003d\u0027Sport Center di Solo a.l Kolam Renang - Tenis - Badminton - Futsal - Fitness - Aerobic dan Primadona  Pub n\u0027 Karaoke telp 0271 635177 - 655556 Pin  29da0584\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/532165121238237185/3RkNSTkt_normal.jpeg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/532165121238237185/3RkNSTkt_normal.jpeg\u0027, url\u003d\u0027null\u0027, isProtected\u003dfalse, followersCount\u003d223, status\u003dnull, profileBackgroundColor\u003d\u0027C0DEED\u0027, profileTextColor\u003d\u0027333333\u0027, profileLinkColor\u003d\u00270084B4\u0027, profileSidebarFillColor\u003d\u0027DDEEF6\u0027, profileSidebarBorderColor\u003d\u0027C0DEED\u0027, profileUseBackgroundImage\u003dtrue, showAllInlineMedia\u003dfalse, friendsCount\u003d51, createdAt\u003dWed Mar 12 22:29:58 PDT 2014, favouritesCount\u003d16, utcOffset\u003d-1, timeZone\u003d\u0027null\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027en\u0027, statusesCount\u003d319, isGeoEnabled\u003dfalse, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d0, isFollowRequestSent\u003dfalse}}\nStatusJSONImpl{createdAt\u003dMon Jan 25 21:46:50 PST 2016, id\u003d691859823273590784, text\u003d\u0027RT @jonmaka0114: もう、うん。好きだああああ💋 https://t.co/rqmCdiaIqh\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/iphone\" rel\u003d\"nofollow\"\u003eTwitter for iPhone\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d0, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@6d9a09a1, retweetedStatus\u003dStatusJSONImpl{createdAt\u003dMon Jan 25 21:44:06 PST 2016, id\u003d691859134082387968, text\u003d\u0027もう、うん。好きだああああ💋 https://t.co/rqmCdiaIqh\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/iphone\" rel\u003d\"nofollow\"\u003eTwitter for iPhone\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d1, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@1bee613e, retweetedStatus\u003dnull, userMentionEntities\u003d[], urlEntities\u003d[URLEntityJSONImpl{url\u003d\u0027https://t.co/rqmCdiaIqh\u0027, expandedURL\u003d\u0027https://twitter.com/agtgkyfhbfyjbgk/status/691857581959155713\u0027, displayURL\u003d\u0027twitter.com/agtgkyfhbfyjbg…\u0027}], hashtagEntities\u003d[], mediaEntities\u003d[], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d4185464728, name\u003d\u0027❤︎미쿠❤︎低速きたよ低浮上\u0027, screenName\u003d\u0027jonmaka0114\u0027, location\u003d\u0027luxion後遺症\u0027, description\u003d\u002700line《99》line EXOカイよりall SNSDスヨンよりall luxion11.7 東京 参戦済み！！韓国に行きたい、けーぽぺんと繋がりたい\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/687210479639334912/Nv9p91DV_normal.jpg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/687210479639334912/Nv9p91DV_normal.jpg\u0027, url\u003d\u0027null\u0027, isProtected\u003dfalse, followersCount\u003d57, status\u003dnull, profileBackgroundColor\u003d\u0027C0DEED\u0027, profileTextColor\u003d\u0027333333\u0027, profileLinkColor\u003d\u00270084B4\u0027, profileSidebarFillColor\u003d\u0027DDEEF6\u0027, profileSidebarBorderColor\u003d\u0027C0DEED\u0027, profileUseBackgroundImage\u003dtrue, showAllInlineMedia\u003dfalse, friendsCount\u003d60, createdAt\u003dSat Nov 14 01:42:42 PST 2015, favouritesCount\u003d178, utcOffset\u003d-1, timeZone\u003d\u0027null\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027ja\u0027, statusesCount\u003d779, isGeoEnabled\u003dfalse, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d3, isFollowRequestSent\u003dfalse}}, userMentionEntities\u003d[UserMentionEntityJSONImpl{name\u003d\u0027❤︎미쿠❤︎低速きたよ低浮上\u0027, screenName\u003d\u0027jonmaka0114\u0027, id\u003d4185464728}], urlEntities\u003d[URLEntityJSONImpl{url\u003d\u0027https://t.co/rqmCdiaIqh\u0027, expandedURL\u003d\u0027https://twitter.com/agtgkyfhbfyjbgk/status/691857581959155713\u0027, displayURL\u003d\u0027twitter.com/agtgkyfhbfyjbg…\u0027}], hashtagEntities\u003d[], mediaEntities\u003d[], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d3261355645, name\u003d\u0027あい。\u0027, screenName\u003d\u0027AgtgkyfHbfyjbgk\u0027, location\u003d\u0027ぱくちゃにょる\u0027, description\u003d\u002799line。JK1。EXOは私の王子様。にょるよりallぺん。15.11.15のるーしょんで、にょる様に、ぺんさもらって死んだ系えくせる。安定、らぶ→@EXO09210112。 韓国→@exo_3320。真面目同盟→@exo19991026。彼氏since.01.04→@osei012。無言ふぉろおっけー。\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/672504968453033984/Oi8ShBrh_normal.jpg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/672504968453033984/Oi8ShBrh_normal.jpg\u0027, url\u003d\u0027null\u0027, isProtected\u003dfalse, followersCount\u003d755, status\u003dnull, profileBackgroundColor\u003d\u0027C0DEED\u0027, profileTextColor\u003d\u0027333333\u0027, profileLinkColor\u003d\u00270084B4\u0027, profileSidebarFillColor\u003d\u0027DDEEF6\u0027, profileSidebarBorderColor\u003d\u0027C0DEED\u0027, profileUseBackgroundImage\u003dtrue, showAllInlineMedia\u003dfalse, friendsCount\u003d714, createdAt\u003dTue Jun 30 06:04:21 PDT 2015, favouritesCount\u003d4647, utcOffset\u003d-1, timeZone\u003d\u0027null\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027ja\u0027, statusesCount\u003d6319, isGeoEnabled\u003dfalse, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d4, isFollowRequestSent\u003dfalse}}\nStatusJSONImpl{createdAt\u003dMon Jan 25 21:46:50 PST 2016, id\u003d691859823282032640, text\u003d\u0027RT @ZaynabSherwani: The darkness has ink eyes, and if you stare long enough, you’re going to see it blink black. That’s the moment to start…\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/android\" rel\u003d\"nofollow\"\u003eTwitter for Android\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d0, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@7af222ec, retweetedStatus\u003dStatusJSONImpl{createdAt\u003dMon Jan 25 19:15:34 PST 2016, id\u003d691821756580007937, text\u003d\u0027The darkness has ink eyes, and if you stare long enough, you’re going to see it blink black. That’s the moment to start writing.\u0027, source\u003d\u0027\u003ca href\u003d\"http://twitter.com/download/iphone\" rel\u003d\"nofollow\"\u003eTwitter for iPhone\u003c/a\u003e\u0027, isTruncated\u003dfalse, inReplyToStatusId\u003d-1, inReplyToUserId\u003d-1, isFavorited\u003dfalse, inReplyToScreenName\u003d\u0027null\u0027, geoLocation\u003dnull, place\u003dnull, retweetCount\u003d9, isPossiblySensitive\u003dfalse, contributorsIDs\u003d[J@2ed2f303, retweetedStatus\u003dnull, userMentionEntities\u003d[], urlEntities\u003d[], hashtagEntities\u003d[], mediaEntities\u003d[], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d2201442792, name\u003d\u0027Zaynab Sherwani\u0027, screenName\u003d\u0027ZaynabSherwani\u0027, location\u003d\u0027Netherlands\u0027, description\u003d\u0027maths, chemistry, physics \u0026analysing psychology. l https://twitter.com/search?q\u003dFrom%3AZaynabSherwani\u0026s\u003dtypd *I don\u0027t own all content tweeted.* ⛔️ NO DM pls❗️\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/668550422714519552/PnFkSGTA_normal.jpg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/668550422714519552/PnFkSGTA_normal.jpg\u0027, url\u003d\u0027http://favstar.fm/users/ZaynabSherwani\u0027, isProtected\u003dfalse, followersCount\u003d12639, status\u003dnull, profileBackgroundColor\u003d\u0027000000\u0027, profileTextColor\u003d\u0027000000\u0027, profileLinkColor\u003d\u002789C9FA\u0027, profileSidebarFillColor\u003d\u0027000000\u0027, profileSidebarBorderColor\u003d\u0027000000\u0027, profileUseBackgroundImage\u003dfalse, showAllInlineMedia\u003dfalse, friendsCount\u003d142, createdAt\u003dMon Nov 18 06:59:18 PST 2013, favouritesCount\u003d101383, utcOffset\u003d3600, timeZone\u003d\u0027Belgrade\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027nl\u0027, statusesCount\u003d129223, isGeoEnabled\u003dfalse, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d137, isFollowRequestSent\u003dfalse}}, userMentionEntities\u003d[UserMentionEntityJSONImpl{name\u003d\u0027Zaynab Sherwani\u0027, screenName\u003d\u0027ZaynabSherwani\u0027, id\u003d2201442792}], urlEntities\u003d[], hashtagEntities\u003d[], mediaEntities\u003d[], currentUserRetweetId\u003d-1, user\u003dUserJSONImpl{id\u003d3290688205, name\u003d\u0027Rabia Kiani\u0027, screenName\u003d\u0027rabia_kiani\u0027, location\u003d\u0027TOWARDS JANNAH INSHAAALLAH.\u0027, description\u003d\u0027A Psychologist, Proud Pakistani n above all blessed mother.  Love to keep an eye on current affairs. IK n Gen Raheel Sharif r my INSPIRATIONS.\u0027, isContributorsEnabled\u003dfalse, profileImageUrl\u003d\u0027http://pbs.twimg.com/profile_images/691808052085968900/45DbAjTm_normal.jpg\u0027, profileImageUrlHttps\u003d\u0027https://pbs.twimg.com/profile_images/691808052085968900/45DbAjTm_normal.jpg\u0027, url\u003d\u0027null\u0027, isProtected\u003dfalse, followersCount\u003d401, status\u003dnull, profileBackgroundColor\u003d\u0027C0DEED\u0027, profileTextColor\u003d\u0027333333\u0027, profileLinkColor\u003d\u00270084B4\u0027, profileSidebarFillColor\u003d\u0027DDEEF6\u0027, profileSidebarBorderColor\u003d\u0027C0DEED\u0027, profileUseBackgroundImage\u003dtrue, showAllInlineMedia\u003dfalse, friendsCount\u003d113, createdAt\u003dFri Jul 24 10:53:07 PDT 2015, favouritesCount\u003d5828, utcOffset\u003d-1, timeZone\u003d\u0027null\u0027, profileBackgroundImageUrl\u003d\u0027http://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundImageUrlHttps\u003d\u0027https://abs.twimg.com/images/themes/theme1/bg.png\u0027, profileBackgroundTiled\u003dfalse, lang\u003d\u0027en\u0027, statusesCount\u003d4382, isGeoEnabled\u003dtrue, isVerified\u003dfalse, translator\u003dfalse, listedCount\u003d0, isFollowRequestSent\u003dfalse}}\n...\n\n"
+      },
+      "dateCreated": "Apr 2, 2015 4:12:42 AM",
+      "dateStarted": "Jan 25, 2016 9:47:48 AM",
+      "dateFinished": "Jan 25, 2016 9:47:50 AM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "",
+      "text": "%sql select createdAt, count(1) from tweets group by createdAt order by createdAt",
+      "dateUpdated": "Jan 25, 2016 9:51:26 AM",
+      "config": {
+        "colWidth": 6.0,
+        "graph": {
+          "mode": "multiBarChart",
+          "height": 292.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "createdAt",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [
+            {
+              "name": "_c1",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          ],
+          "groups": [],
+          "scatter": {
+            "xAxis": {
+              "name": "createdAt",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          }
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1427958733477_-722079528",
+      "id": "20150402-161213_1471091546",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "createdAt\t_c1\n1453787406\t32\n1453787407\t39\n1453787408\t38\n1453787409\t39\n1453787410\t36\n1453787411\t39\n1453787412\t44\n1453787413\t42\n1453787414\t37\n1453787415\t37\n1453787416\t25\n1453787417\t38\n1453787418\t25\n1453787419\t35\n1453787420\t27\n1453787421\t38\n1453787422\t41\n1453787423\t40\n1453787424\t31\n1453787425\t36\n1453787426\t39\n1453787427\t42\n1453787428\t34\n1453787429\t44\n1453787430\t47\n1453787431\t38\n1453787432\t34\n1453787433\t32\n1453787434\t31\n1453787435\t31\n1453787436\t34\n1453787437\t46\n1453787438\t41\n1453787439\t39\n1453787440\t37\n1453787441\t41\n1453787442\t30\n1453787443\t48\n1453787444\t31\n1453787445\t38\n1453787446\t36\n1453787447\t34\n1453787448\t27\n1453787449\t34\n1453787450\t25\n1453787451\t37\n1453787452\t37\n1453787453\t40\n1453787454\t26\n1453787455\t37\n1453787456\t30\n1453787457\t33\n1453787458\t41\n1453787459\t35\n1453787460\t38\n1453787461\t37\n1453787462\t27\n1453787463\t31\n1453787464\t38\n1453787465\t38\n"
+      },
+      "dateCreated": "Apr 2, 2015 4:12:13 AM",
+      "dateStarted": "Jan 25, 2016 9:51:06 AM",
+      "dateFinished": "Jan 25, 2016 9:51:21 AM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "",
+      "text": "%sql select sentiment(text), count(1) from tweets where text like \u0027%girl%\u0027 group by sentiment(text)",
+      "dateUpdated": "Jan 25, 2016 9:49:43 AM",
+      "config": {
+        "colWidth": 6.0,
+        "graph": {
+          "mode": "pieChart",
+          "height": 301.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "_c0",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [
+            {
+              "name": "_c1",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          ],
+          "groups": [],
+          "scatter": {
+            "xAxis": {
+              "name": "_c0",
+              "index": 0.0,
+              "aggr": "sum"
+            },
+            "yAxis": {
+              "name": "_c1",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          }
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1427958823482_2108856906",
+      "id": "20150402-161343_815277226",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "_c0\t_c1\npositive\t3\nnegative\t1\nneutral\t14\n"
+      },
+      "dateCreated": "Apr 2, 2015 4:13:43 AM",
+      "dateStarted": "Jan 25, 2016 9:48:03 AM",
+      "dateFinished": "Jan 25, 2016 9:48:08 AM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "",
+      "text": "",
+      "dateUpdated": "Jan 25, 2016 9:43:17 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1427958844485_-547803601",
+      "id": "20150402-161404_1935247117",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT"
+      },
+      "dateCreated": "Apr 2, 2015 4:14:04 AM",
+      "dateStarted": "Jan 25, 2016 9:44:34 AM",
+      "dateFinished": "Jan 25, 2016 9:44:35 AM",
+      "status": "FINISHED",
+      "errorMessage": "",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "/tests/Quick Test",
+  "id": "2AJD8DXCU",
+  "lastReplName": {
+    "value": ""
+  },
+  "angularObjects": {
+    "2BYZUF3XW:shared_process": [],
+    "2C3HDT2QZ:shared_process": [],
+    "2C14R6UAS:shared_process": [],
+    "2BZ7ZF1DZ:shared_process": [],
+    "2BZZW5B1E:shared_process": [],
+    "2BZUJ3VWH:shared_process": [],
+    "2C11ZSGTU:shared_process": [],
+    "2C2FSFBAP:shared_process": [],
+    "2C2AJNBHE:shared_process": [],
+    "2C1Q5K5AE:shared_process": [],
+    "2BZURR9MC:shared_process": [],
+    "2BZDN8HGS:shared_process": [],
+    "2C2GE1QR4:shared_process": [],
+    "2C1S1XTVD:shared_process": [],
+    "2C1B9ZAH2:shared_process": [],
+    "2C3BWHZ3H:shared_process": [],
+    "2C1ZWU9WE:shared_process": [],
+    "2BZTVTZW1:shared_process": [],
+    "2C1SV88GY:shared_process": []
+  },
+  "config": {
+    "looknfeel": "default"
+  },
+  "info": {}
+}
